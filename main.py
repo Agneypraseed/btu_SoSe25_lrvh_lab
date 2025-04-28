@@ -48,7 +48,12 @@ x,y = (300, 300)  # Center of the screen
 radius = 50  # Radius of the circle
 # Create a Circle object
 damping_factor = 0.98
-circle = Circle(x, y, radius, (255, 0, 0), 1, -1,damping_factor)
+# circle = Circle(x, y, radius, (255, 0, 0), 1, -1,damping_factor)
+
+circles = []
+for _ in range(10):
+    circle = Circle(x=random.randint(0, WIDTH), y=random.randint(0, HEIGHT), radius=random.randint(10, 50), color=(random.randint(0,255), random.randint(0,255), random.randint(0,255)), speed_x=random.uniform(-10, 10), speed_y=random.uniform(-10, 10), damping_factor=damping_factor)
+    circles.append(circle)
 
 running = True
 while running:
@@ -58,7 +63,8 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                circle.reactivate()    
+                for circle in circles:
+                    circle.reactivate()    
 
     screen.fill((0, 0, 0))
 
@@ -73,9 +79,9 @@ while running:
     # y-= 1  # Move the circle down
     # pygame.draw.circle(surface=screen, color=(255, 0, 0), center=(x,y), radius=radius)
 
-    
-    circle.draw()  # Draw the circle on the screen
-    circle.move()  # Move the circle
+    for circle in circles:
+        circle.draw()  # Draw the circle on the screen
+        circle.move()  # Move the circle
 
 
 # updates the display to show the changes. This is crucial as Pygame uses double buffering
