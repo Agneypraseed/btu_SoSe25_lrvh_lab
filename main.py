@@ -9,13 +9,14 @@ clock = pygame.time.Clock()
 fps = 60  # Frames per second
 
 class Circle:
-    def __init__(self,x,y,radius,color,speed_x,speed_y):
+    def __init__(self,x,y,radius,color,speed_x,speed_y,damping_factor):
         self.x = x
         self.y = y
         self.radius = radius
         self.color = color
         self.speed_x = random.uniform(-10,10)
         self.speed_y = random.uniform(-10,10)
+        self.damping_factor = damping_factor
 
     def draw(self):
         pygame.draw.circle(
@@ -26,11 +27,11 @@ class Circle:
         )    
 
     def move(self):
-        self.speed_x = self.speed_x + random.uniform(-0.2,0.2)  # Random speed in x direction
-        self.speed_y = self.speed_y + random.uniform(-0.2,0.2)
-    
-        self.x = self.x * 0.98
-        self.y = self.y * 0.98
+        # self.speed_x = self.speed_x + random.uniform(-0.2,0.2)  # Random speed in x direction
+        # self.speed_y = self.speed_y + random.uniform(-0.2,0.2)
+
+        self.speed_x = self.speed_x * self.damping_factor
+        self.speed_y = self.speed_y * self.damping_factor        
 
         self.x = self.x + int(self.speed_x)
         self.y = self.y + int(self.speed_y)
@@ -38,17 +39,26 @@ class Circle:
         self.x %= WIDTH  # Wrap around the screen horizontally
         self.y %= HEIGHT  # Wrap around the screen vertically
 
+    def reactivate(self):
+        self.speed_x = random.uniform(-10,10)
+        self.speed_y = random.uniform(-10,10)  
+
 # Set the initial position and radius of the circle
 x,y = (300, 300)  # Center of the screen
 radius = 50  # Radius of the circle
 # Create a Circle object
-circle = Circle(x, y, radius, (255, 0, 0), 1, -1)
+damping_factor = 0.98
+circle = Circle(x, y, radius, (255, 0, 0), 1, -1,damping_factor)
 
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                circle.reactivate()    
 
     screen.fill((0, 0, 0))
 
