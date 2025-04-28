@@ -1,0 +1,75 @@
+import pygame
+import random
+
+pygame.init()
+
+WIDTH, HEIGHT = 600, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
+fps = 60  # Frames per second
+
+class Circle:
+    def __init__(self,x,y,radius,color,speed_x,speed_y):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.speed_x = random.uniform(-10,10)
+        self.speed_y = random.uniform(-10,10)
+
+    def draw(self):
+        pygame.draw.circle(
+            surface=screen,
+            color=self.color,
+            center=(self.x, self.y),
+            radius=self.radius
+        )    
+
+    def move(self):
+        self.speed_x = self.speed_x + random.uniform(-0.2,0.2)  # Random speed in x direction
+        self.speed_y = self.speed_y + random.uniform(-0.2,0.2)
+    
+        self.x = self.x * 0.98
+        self.y = self.y * 0.98
+
+        self.x = self.x + int(self.speed_x)
+        self.y = self.y + int(self.speed_y)
+
+        self.x %= WIDTH  # Wrap around the screen horizontally
+        self.y %= HEIGHT  # Wrap around the screen vertically
+
+# Set the initial position and radius of the circle
+x,y = (300, 300)  # Center of the screen
+radius = 50  # Radius of the circle
+# Create a Circle object
+circle = Circle(x, y, radius, (255, 0, 0), 1, -1)
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    screen.fill((0, 0, 0))
+
+# Draw a red circle
+# A red circle is drawn using pygame.draw.circle() with these parameters:
+# screen: the surface to draw on
+# (255, 0, 0): RGB values for red
+# (300, 300): center position of the circle (middle of the 600x600 window)
+# 50: radius of the circle in pixels
+
+    # x+= 1  # Move the circle to the right
+    # y-= 1  # Move the circle down
+    # pygame.draw.circle(surface=screen, color=(255, 0, 0), center=(x,y), radius=radius)
+
+    
+    circle.draw()  # Draw the circle on the screen
+    circle.move()  # Move the circle
+
+
+# updates the display to show the changes. This is crucial as Pygame uses double buffering
+    pygame.display.flip()
+    clock.tick(fps)  # Set the frame rate
+
+pygame.quit()
