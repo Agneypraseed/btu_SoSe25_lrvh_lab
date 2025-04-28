@@ -1,1 +1,2 @@
-# btu_SoSe25_lrvh_lab
+#### Learning in Real and Virtual Humans
+###### SoSe 2025
