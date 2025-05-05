@@ -57,9 +57,10 @@ class Circle:
         time_since_last_stimulus = current_time - self.last_stimulus_time
 
         if time_since_last_stimulus < 2000:  # 2 second
-            self.sensitivity *= 0.9  # Increase sensitivity
+            self.sensitivity *= 0.9 # Decrease sensitivity
         else:
-            self.sensitivity += 2    
+            self.sensitivity = min(
+                1, self.sensitivity + 0.01 * (time_since_last_stimulus // 1000))
 
         self.last_stimulus_time = current_time
 
@@ -99,14 +100,14 @@ while running:
     current_tick = pygame.time.get_ticks()  # Get the current time in milliseconds
     elapsed_time = (current_tick - start_time) // 1000  # Convert to seconds
 
-    avg_sensitity = sum(circle.sensitivity for circle in circles) / len(circles)
+    avg_sensitity = sum(
+        circle.sensitivity for circle in circles) / len(circles)
     avg_sensitity_text = f"Avg Sensitivity: {avg_sensitity:.3f}"
 
     elapsed_time_text = f"Elapsed Time: {elapsed_time:.2f} seconds"
 
     text = elapsed_time_text + "\n" + avg_sensitity_text
     rendered_text = font.render(text, True, (0, 0, 0))
-    
 
 
 # Draw a red circle
