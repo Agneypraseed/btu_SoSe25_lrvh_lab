@@ -11,6 +11,14 @@ pygame.display.set_caption("Bouncing Circles")
 pygame.font.init()
 font = pygame.font.SysFont('Arial', 20)
 
+pygame.mixer.init()  # Initialize the sound mixer
+
+# Load the bell sound
+# Make sure bell.wav is in the same folder as main.py
+bell = pygame.mixer.Sound('bell.wav')
+bell.set_volume(0.5)  # Set the volume (0.0 to 1.0)
+
+
 clock = pygame.time.Clock()
 fps = 60  # Frames per second
 
@@ -57,10 +65,10 @@ class Circle:
         time_since_last_stimulus = current_time - self.last_stimulus_time
 
         if time_since_last_stimulus < 2000:  # 2 second
-            self.sensitivity *= 0.9 # Decrease sensitivity
-        else:
-            self.sensitivity = min(
-                1, self.sensitivity + 0.01 * (time_since_last_stimulus // 1000))
+            self.sensitivity *= 0.9  # Decrease sensitivity
+        # else:
+        #     self.sensitivity = min(
+        #         1, self.sensitivity + 0.01 * (time_since_last_stimulus // 1000))
 
         self.last_stimulus_time = current_time
 
@@ -74,6 +82,8 @@ radius = 50  # Radius of the circle
 # Create a Circle object
 damping_factor = 0.98
 # circle = Circle(x, y, radius, (255, 0, 0), 1, -1,damping_factor)
+
+pairings = []
 
 circles = []
 for _ in range(10):
@@ -94,19 +104,36 @@ while running:
                 current_time = pygame.time.get_ticks()
                 for circle in circles:
                     circle.reactivate(current_time)
+                pairings.append(("UCS", current_time))
+            if event.key == pygame.K_b:
+                current_time = pygame.time.get_ticks()
+                bell.play()
+
+                pairings.append(("CS", current_time))
+
+                ucs_times = [t for k, t in pairings if k == "UCS"]
+                cs_times = [t for k, t in pairings if k == "CS"]
+
+                recent_pairings = [
+                    (cs, ucs)
+                    for cs in cs_times
+                    for ucs in ucs_times
+                    if 0 < ucs - cs <= 1000
+                ]
 
     screen.fill((255, 255, 255))
 
     current_tick = pygame.time.get_ticks()  # Get the current time in milliseconds
     elapsed_time = (current_tick - start_time) // 1000  # Convert to seconds
 
-    avg_sensitity = sum(
-        circle.sensitivity for circle in circles) / len(circles)
-    avg_sensitity_text = f"Avg Sensitivity: {avg_sensitity:.3f}"
+    # avg_sensitity = sum(
+    #     circle.sensitivity for circle in circles) / len(circles)
+    # avg_sensitity_text = f"Avg Sensitivity: {avg_sensitity:.3f}"
 
     elapsed_time_text = f"Elapsed Time: {elapsed_time:.2f} seconds"
 
-    text = elapsed_time_text + "\n" + avg_sensitity_text
+    text = elapsed_time_text
+    # text = elapsed_time_text + "\n" + avg_sensitity_text
     rendered_text = font.render(text, True, (0, 0, 0))
 
 
