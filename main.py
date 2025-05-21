@@ -84,6 +84,8 @@ damping_factor = 0.98
 # circle = Circle(x, y, radius, (255, 0, 0), 1, -1,damping_factor)
 
 pairings = []
+conditioning_threshold = 3 
+cs_learned = False
 
 circles = []
 for _ in range(10):
@@ -121,6 +123,13 @@ while running:
                     if 0 < ucs - cs <= 1000
                 ]
 
+                if len(recent_pairings) >= conditioning_threshold:
+                    cs_learned = True
+                if cs_learned:
+                    for circle in circles:
+                        circle.reactivate(current_time)
+
+
     screen.fill((255, 255, 255))
 
     current_tick = pygame.time.get_ticks()  # Get the current time in milliseconds
@@ -131,9 +140,10 @@ while running:
     # avg_sensitity_text = f"Avg Sensitivity: {avg_sensitity:.3f}"
 
     elapsed_time_text = f"Elapsed Time: {elapsed_time:.2f} seconds"
+    cs_learned_text = f"CS Learned: {cs_learned}"
 
-    text = elapsed_time_text
     # text = elapsed_time_text + "\n" + avg_sensitity_text
+    text = elapsed_time_text + "\n" + cs_learned_text
     rendered_text = font.render(text, True, (0, 0, 0))
 
 
