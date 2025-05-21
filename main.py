@@ -83,8 +83,11 @@ radius = 50  # Radius of the circle
 damping_factor = 0.98
 # circle = Circle(x, y, radius, (255, 0, 0), 1, -1,damping_factor)
 
+# LAB 3
+# Space is uncoditional stimulus, bell is a neutral stimilus initally,
+# then we paired it as a conditional stimulus
 pairings = []
-conditioning_threshold = 3 
+conditioning_threshold = 3
 cs_learned = False
 
 circles = []
@@ -128,7 +131,6 @@ while running:
                 if cs_learned:
                     for circle in circles:
                         circle.reactivate(current_time)
-
 
     screen.fill((255, 255, 255))
 
