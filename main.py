@@ -95,6 +95,10 @@ extinction_threshold = 5
 cs_only_trials = 0
 cs_extinguished = False
 
+recovery_threshold = 5000  
+extinction_time = None
+recovered = False
+
 circles = []
 for _ in range(10):
     circle = Circle(x=random.randint(0, WIDTH), y=random.randint(0, HEIGHT), radius=random.randint(10, 50), color=(random.randint(0, 255), random.randint(
@@ -144,7 +148,8 @@ while running:
                                 circle.reactivate(current_time)
                         else:
                             cs_learned = False
-                            cs_extinguished = True                                  
+                            cs_extinguished = True    
+                            extinction_time = current_time                              
                     else:
                         cs_only_trials = 0
                         for circle in circles:
@@ -159,6 +164,14 @@ while running:
     current_tick = pygame.time.get_ticks()  # Get the current time in milliseconds
     elapsed_time = (current_tick - start_time) // 1000  # Convert to seconds
 
+    if cs_extinguished and extinction_time is not None:
+        time_since_extinction = current_tick - extinction_time
+        if time_since_extinction >= recovery_threshold:
+            recovered = True
+            cs_extinguished = False
+            cs_learned = True
+            cs_only_trials = 0            
+
     # avg_sensitity = sum(
     #     circle.sensitivity for circle in circles) / len(circles)
     # avg_sensitity_text = f"Avg Sensitivity: {avg_sensitity:.3f}"
@@ -166,10 +179,11 @@ while running:
     elapsed_time_text = f"Elapsed Time: {elapsed_time:.2f} seconds"
     cs_learned_text = f"CS Learned: {cs_learned}"
     cs_extinction_text = f"CS Extinction Trials: {cs_extinguished}"
+    recovered_text = f"CS Recovered: {recovered}"
 
-
+ 
     # text = elapsed_time_text + "\n" + avg_sensitity_text
-    text = elapsed_time_text + "\n" + cs_learned_text + "\n" + cs_extinction_text
+    text = elapsed_time_text + "\n" + cs_learned_text + "\n" + cs_extinction_text + "\n" + recovered_text
     rendered_text = font.render(text, True, (0, 0, 0))
 
 
