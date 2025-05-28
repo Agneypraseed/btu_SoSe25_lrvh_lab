@@ -90,6 +90,11 @@ pairings = []
 conditioning_threshold = 3
 cs_learned = False
 
+
+extinction_threshold = 5
+cs_only_trials = 0
+cs_extinguished = False
+
 circles = []
 for _ in range(10):
     circle = Circle(x=random.randint(0, WIDTH), y=random.randint(0, HEIGHT), radius=random.randint(10, 50), color=(random.randint(0, 255), random.randint(
@@ -129,8 +134,25 @@ while running:
                 if len(recent_pairings) >= conditioning_threshold:
                     cs_learned = True
                 if cs_learned:
-                    for circle in circles:
-                        circle.reactivate(current_time)
+
+                    #Lab 4    
+                    recent_ucs = [t for k, t in pairings if k == "UCS" and 0 < current_time - t <= 1000]
+                    if not recent_ucs:
+                        cs_only_trials +=1
+                        if cs_only_trials < extinction_threshold:
+                            for circle in circles:
+                                circle.reactivate(current_time)
+                        else:
+                            cs_learned = False
+                            cs_extinguished = True                                  
+                    else:
+                        cs_only_trials = 0
+                        for circle in circles:
+                            circle.reactivate(current_time)
+                                        
+
+                    # for circle in circles:
+                    #     circle.reactivate(current_time)
 
     screen.fill((255, 255, 255))
 
@@ -143,9 +165,11 @@ while running:
 
     elapsed_time_text = f"Elapsed Time: {elapsed_time:.2f} seconds"
     cs_learned_text = f"CS Learned: {cs_learned}"
+    cs_extinction_text = f"CS Extinction Trials: {cs_extinguished}"
+
 
     # text = elapsed_time_text + "\n" + avg_sensitity_text
-    text = elapsed_time_text + "\n" + cs_learned_text
+    text = elapsed_time_text + "\n" + cs_learned_text + "\n" + cs_extinction_text
     rendered_text = font.render(text, True, (0, 0, 0))
 
 
