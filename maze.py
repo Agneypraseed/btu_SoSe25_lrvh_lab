@@ -21,6 +21,10 @@ BLUE = (50, 50, 255)
 GREEN = (0, 200, 0)
 RED = (200, 0, 0)
 
+ACTION = [(0, -1), (0, 1), (-1, 0), (1, 0)]  # Up, Down, Left, Right
+
+
+
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Maze")
@@ -30,6 +34,12 @@ FPS = 30
 
 agent_pos = [0, 0]
 score = 0
+episode = 0
+
+def reset_agent(): 
+    global agent_pos, score, episode   
+    agent_pos = [0, 0]  # Reset agent position to start    
+    episode += 1    
 
 
 def draw_grid():
@@ -52,9 +62,10 @@ def draw_grid():
         agent_pos[0] * TILE_SIZE + 10, agent_pos[1] * TILE_SIZE + 10, TILE_SIZE - 20, TILE_SIZE - 20)
     pygame.draw.rect(screen, BLUE, agent_rect)  # Agent
 
-    score_text = font.render(f"Score: {score}", True, BLACK)
+    score_text = font.render(f"Score: {score}, Episode : {episode}", True, BLACK)
     score_rect = score_text.get_rect()
-    score_rect.center = (WIDTH // 2, HEIGHT - 45)  # Position in the extra space below maze
+    # Position in the extra space below maze
+    score_rect.center = (WIDTH // 2, HEIGHT - 45)
     screen.blit(score_text, score_rect)
 
 
@@ -72,22 +83,30 @@ while running:
             elif event.key == pygame.K_UP:
                 dy = -1
             elif event.key == pygame.K_DOWN:
-                dy = 1    
+                dy = 1
 
             if dx != 0 or dy != 0:
                 new_x = agent_pos[0] + dx
                 new_y = agent_pos[1] + dy
 
                 if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
+
+                    if MAZE[new_y][new_x] == 1:
+                        reward = -1
+                        score += reward
+
                     if MAZE[new_y][new_x] != 1:
                         agent_pos[0] = new_x
                         agent_pos[1] = new_y
 
                         if MAZE[new_y][new_x] == 2:
-                            score += 1
-                            print(f"Score: {score}")
+                            reward = 10
+                            score += reward                            
                             # Reset agent position to start
-                            agent_pos = [0, 0]
+                            reset_agent()
+                        elif MAZE[new_y][new_x] == 0:
+                            reward = -0.1
+                            score += reward
 
     screen.fill(WHITE)
     draw_grid()
